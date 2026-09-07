@@ -1,56 +1,120 @@
 # Music Genre Audio CNN
 
-This is a separate GTZAN audio project. It trains a CNN from WAV audio, not pre-generated PNG images.
+This project trains convolutional neural networks directly from audio files. Each track is loaded with `librosa`, converted to a 128-bin mel spectrogram, divided into ten three-second excerpts, and classified by a CNN. The project supports GTZAN, FMA Small, and Artist20-style datasets.
 
-Pipeline:
+The training pipeline uses:
 
-1. Load GTZAN tracks from `../raw/gtzan/genres`.
-2. Split complete tracks into train, validation, and test sets.
-3. Convert each five-second audio window to a 128-bin mel spectrogram.
-4. Apply training-only brightness, noise, and time-mask augmentation.
-5. Train a CNN and save evaluation results and graphs.
+- 22,050 Hz mono audio
+- 30 seconds per track
+- ten three-second excerpts per track
+- training-only brightness, Gaussian-noise, and time-masking augmentation
+- stratified train, validation, and test splits
+- Keras models with batch normalization, dropout, L2 regularization, and early stopping
+
+Large audio datasets are not included in the Git repository. See the root `.gitignore` file for the excluded local folders.
+
+## Project layout
+
+```text
+music_genre_audio_cnn/
+	train.py                 # GTZAN, ten genres
+	train_fma.py             # FMA Small, eight genres
+	train_artist20.py        # Artist20, one class per artist
+	requirements.txt
+	results/                 # GTZAN model and evaluation outputs
+	results_fma/             # FMA outputs created after training
+	results_artist20/        # Artist20 model and evaluation outputs
+```
 
 ## Setup
 
-From `NEW FYP`:
+From the repository root (`NEW FYP`), create the environment and install the dependencies:
 
 ```powershell
 uv venv --python 3.12 .venv
-uv pip install --python ".venv\\Scripts\\python.exe" -r "music_genre_audio_cnn\\requirements.txt"
+uv pip install --python ".venv\Scripts\python.exe" -r "music_genre_audio_cnn\requirements.txt"
 ```
 
-## Run
+The scripts require Python 3.12, TensorFlow, librosa, NumPy, Matplotlib, and scikit-learn. The FMA-to-GTZAN conversion script also uses `soundfile`; install it if you use that workflow and it is not already available in your environment.
+
+## Dataset preparation
+
+### GTZAN
+
+The GTZAN trainer expects this structure:
+
+```text
+raw/gtzan/genres/
+	blues/       classical/   country/     disco/       hiphop/
+	jazz/        metal/       pop/         reggae/      rock/
+```
+
+To create GTZAN-style folders from FMA metadata, run the labeling utility from the repository root:
 
 ```powershell
-& ".venv\\Scripts\\python.exe" "music_genre_audio_cnn\\train.py"
+& ".venv\Scripts\python.exe" "fma_to_gtzan_labeling\label_fma_to_gtzan.py" --limit 500
 ```
 
-Outputs are written to `music_genre_audio_cnn/results`: `results.json`, `training_curves.png`, `confusion_matrix.png`, and the saved Keras model.
+Use `--dry-run` to preview the mapping. The default source and metadata paths are `raw/fma_small` and `raw/fma_metadata/raw_tracks.csv`; the default output is `raw/gtzan/genres`.
 
-Accuracy is measured on held-out tracks and is not guaranteed to exceed a fixed threshold. The important distinction from the earlier image project is that this model learns from audio-derived mel spectrograms.
+### FMA Small
 
-## Artist20 classifier
+The FMA trainer uses eight top-level genres: Electronic, Experimental, Folk, Hip-Hop, Instrumental, International, Pop, and Rock. First organize the FMA Small files:
 
-The CNN uses the MP3 archive. From `NEW FYP`, extract it once:
+```powershell
+& ".venv\Scripts\python.exe" "fma_to_gtzan_labeling\organize_fma_small.py"
+```
+
+The script reads `raw/fma_small` and `raw/fma_metadata/tracks.csv`, then creates `raw/fma_small_organized/genres`.
+
+### Artist20
+
+Extract the Artist20 MP3 archive once:
 
 ```powershell
 tar -xzf "artist20\artist20-mp3s-32k.tgz" -C "artist20"
 ```
 
-This produces the expected one-artist-per-directory layout:
+The expected layout is:
 
 ```text
 artist20/artist20/mp3s-32k/
-	artist_name_1/
-		album_name/track_01.mp3
-	artist_name_2/
-		album_name/track_01.mp3
+	artist_name_1/album_name/track_01.mp3
+	artist_name_2/album_name/track_01.mp3
 ```
 
-Then run:
+The MP3 archive is sufficient. The precomputed MFCC and chroma archives are not used by this mel-spectrogram CNN.
+
+## Training
+
+Run commands from the repository root:
 
 ```powershell
+# GTZAN
+& ".venv\Scripts\python.exe" "music_genre_audio_cnn\train.py"
+
+# FMA Small
+& ".venv\Scripts\python.exe" "music_genre_audio_cnn\train_fma.py"
+
+# Artist20
 & ".venv\Scripts\python.exe" "music_genre_audio_cnn\train_artist20.py"
 ```
 
-The MP3 archive is sufficient. `artist20-mfccs.tgz` and `artist20-chromftrs.tgz` are precomputed features for other model types and are not used by this mel-spectrogram CNN. Use `--data-dir` to select a different Artist20 folder, and `--epochs` or `--batch-size` to adjust training. The model, discovered artist labels, and evaluation report are saved in `music_genre_audio_cnn/results_artist20`.
+Artist20 accepts optional arguments:
+
+```powershell
+& ".venv\Scripts\python.exe" "music_genre_audio_cnn\train_artist20.py" --data-dir "path\to\artist20" --epochs 40 --batch-size 32
+```
+
+## Outputs and evaluation
+
+The GTZAN and FMA scripts save their results under `results` and `results_fma`, respectively:
+
+- `*.keras`: best model checkpoint selected by validation accuracy
+- `results.json`: test loss, test accuracy, per-class report, split sizes, and training details
+- `training_curves.png`: training and validation loss/accuracy
+- `confusion_matrix.png`: test-set confusion matrix
+
+The Artist20 script saves its best model, `results.json`, and the discovered artist order in `results_artist20`. Artist20 evaluation averages predictions across the ten excerpts from each track before calculating track-level accuracy.
+
+Reported accuracy is measured on held-out tracks and depends on the dataset version, available audio files, and training run. It should not be interpreted as a guaranteed threshold.
