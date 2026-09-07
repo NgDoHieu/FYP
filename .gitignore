@@ -1,0 +1,16 @@
+# Raw datasets and downloaded audio are too large for GitHub.
+raw/
+artist20/
+
+# Local Python environments and generated caches.
+.venv/
+venv/
+env/
+__pycache__/
+*.py[cod]
+.ipynb_checkpoints/
+
+# Training and notebook-generated artifacts.
+*.h5
+*.ckpt
+*.tmp

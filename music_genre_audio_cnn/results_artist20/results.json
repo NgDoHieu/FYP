@@ -1,0 +1,174 @@
+{
+  "dataset": "Artist20",
+  "artists": [
+    "aerosmith",
+    "beatles",
+    "creedence_clearwater_revival",
+    "cure",
+    "dave_matthews_band",
+    "depeche_mode",
+    "fleetwood_mac",
+    "garth_brooks",
+    "green_day",
+    "led_zeppelin",
+    "madonna",
+    "metallica",
+    "prince",
+    "queen",
+    "radiohead",
+    "roxette",
+    "steely_dan",
+    "suzanne_vega",
+    "tori_amos",
+    "u2"
+  ],
+  "test_accuracy": 0.508833922261484,
+  "test_loss": 1.6114248037338257,
+  "evaluation": "Track-level accuracy after averaging predictions from ten three-second excerpts.",
+  "augmentation": [
+    "brightness",
+    "Gaussian noise",
+    "time masking"
+  ],
+  "classification_report": {
+    "aerosmith": {
+      "precision": 0.42857142857142855,
+      "recall": 0.6,
+      "f1-score": 0.5,
+      "support": 10.0
+    },
+    "beatles": {
+      "precision": 0.45161290322580644,
+      "recall": 0.8235294117647058,
+      "f1-score": 0.5833333333333334,
+      "support": 17.0
+    },
+    "creedence_clearwater_revival": {
+      "precision": 0.8,
+      "recall": 0.7272727272727273,
+      "f1-score": 0.7619047619047619,
+      "support": 11.0
+    },
+    "cure": {
+      "precision": 0.15384615384615385,
+      "recall": 0.13333333333333333,
+      "f1-score": 0.14285714285714285,
+      "support": 15.0
+    },
+    "dave_matthews_band": {
+      "precision": 0.875,
+      "recall": 0.4666666666666667,
+      "f1-score": 0.6086956521739131,
+      "support": 15.0
+    },
+    "depeche_mode": {
+      "precision": 0.4782608695652174,
+      "recall": 0.7333333333333333,
+      "f1-score": 0.5789473684210527,
+      "support": 15.0
+    },
+    "fleetwood_mac": {
+      "precision": 0.45,
+      "recall": 0.5625,
+      "f1-score": 0.5,
+      "support": 16.0
+    },
+    "garth_brooks": {
+      "precision": 0.9230769230769231,
+      "recall": 0.9230769230769231,
+      "f1-score": 0.9230769230769231,
+      "support": 13.0
+    },
+    "green_day": {
+      "precision": 0.6875,
+      "recall": 0.6111111111111112,
+      "f1-score": 0.6470588235294118,
+      "support": 18.0
+    },
+    "led_zeppelin": {
+      "precision": 0.3333333333333333,
+      "recall": 0.1,
+      "f1-score": 0.15384615384615385,
+      "support": 10.0
+    },
+    "madonna": {
+      "precision": 0.16666666666666666,
+      "recall": 0.07142857142857142,
+      "f1-score": 0.1,
+      "support": 14.0
+    },
+    "metallica": {
+      "precision": 0.8,
+      "recall": 0.6153846153846154,
+      "f1-score": 0.6956521739130435,
+      "support": 13.0
+    },
+    "prince": {
+      "precision": 0.8571428571428571,
+      "recall": 0.46153846153846156,
+      "f1-score": 0.6,
+      "support": 13.0
+    },
+    "queen": {
+      "precision": 0.3333333333333333,
+      "recall": 0.25,
+      "f1-score": 0.2857142857142857,
+      "support": 16.0
+    },
+    "radiohead": {
+      "precision": 0.4375,
+      "recall": 0.4666666666666667,
+      "f1-score": 0.45161290322580644,
+      "support": 15.0
+    },
+    "roxette": {
+      "precision": 0.47619047619047616,
+      "recall": 0.5555555555555556,
+      "f1-score": 0.5128205128205128,
+      "support": 18.0
+    },
+    "steely_dan": {
+      "precision": 0.8333333333333334,
+      "recall": 0.5,
+      "f1-score": 0.625,
+      "support": 10.0
+    },
+    "suzanne_vega": {
+      "precision": 0.3076923076923077,
+      "recall": 0.2857142857142857,
+      "f1-score": 0.2962962962962963,
+      "support": 14.0
+    },
+    "tori_amos": {
+      "precision": 0.5,
+      "recall": 0.7647058823529411,
+      "f1-score": 0.6046511627906976,
+      "support": 17.0
+    },
+    "u2": {
+      "precision": 0.3333333333333333,
+      "recall": 0.38461538461538464,
+      "f1-score": 0.35714285714285715,
+      "support": 13.0
+    },
+    "accuracy": 0.508833922261484,
+    "macro avg": {
+      "precision": 0.5313196959655586,
+      "recall": 0.5018216464907641,
+      "f1-score": 0.4964305175523096,
+      "support": 283.0
+    },
+    "weighted avg": {
+      "precision": 0.523307009471266,
+      "recall": 0.508833922261484,
+      "f1-score": 0.49675118915651323,
+      "support": 283.0
+    }
+  },
+  "track_split": {
+    "train": 904,
+    "validation": 226,
+    "test": 283
+  },
+  "model_file": "C:\\Users\\OWNER\\Documents\\NEW FYP\\music_genre_audio_cnn\\results_artist20\\artist20_audio_cnn.keras"
+}

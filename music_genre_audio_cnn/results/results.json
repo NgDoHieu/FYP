@@ -1,0 +1,105 @@
+{
+  "dataset": "GTZAN WAV audio",
+  "test_accuracy": 0.6707317233085632,
+  "test_loss": 1.0785497426986694,
+  "classification_report": {
+    "blues": {
+      "precision": 0.8671328671328671,
+      "recall": 0.8266666666666667,
+      "f1-score": 0.8464163822525598,
+      "support": 150.0
+    },
+    "classical": {
+      "precision": 0.7611111111111111,
+      "recall": 0.9133333333333333,
+      "f1-score": 0.8303030303030303,
+      "support": 150.0
+    },
+    "country": {
+      "precision": 0.7868852459016393,
+      "recall": 0.64,
+      "f1-score": 0.7058823529411765,
+      "support": 150.0
+    },
+    "disco": {
+      "precision": 0.6666666666666666,
+      "recall": 0.76,
+      "f1-score": 0.7102803738317757,
+      "support": 150.0
+    },
+    "hiphop": {
+      "precision": 0.7685525349008082,
+      "recall": 0.8077220077220078,
+      "f1-score": 0.7876506024096386,
+      "support": 2590.0
+    },
+    "jazz": {
+      "precision": 0.8260869565217391,
+      "recall": 0.8866666666666667,
+      "f1-score": 0.8553054662379421,
+      "support": 150.0
+    },
+    "metal": {
+      "precision": 0.4121306376360809,
+      "recall": 0.44166666666666665,
+      "f1-score": 0.4263877715205149,
+      "support": 600.0
+    },
+    "pop": {
+      "precision": 0.6351791530944625,
+      "recall": 0.34210526315789475,
+      "f1-score": 0.44469783352337516,
+      "support": 1140.0
+    },
+    "reggae": {
+      "precision": 0.6594594594594595,
+      "recall": 0.746938775510204,
+      "f1-score": 0.7004784688995215,
+      "support": 490.0
+    },
+    "rock": {
+      "precision": 0.6171685704395985,
+      "recall": 0.6779467680608365,
+      "f1-score": 0.6461315455698496,
+      "support": 2630.0
+    },
+    "accuracy": 0.6707317073170732,
+    "macro avg": {
+      "precision": 0.7000373202864433,
+      "recall": 0.7043046147784275,
+      "f1-score": 0.6953533827489383,
+      "support": 8200.0
+    },
+    "weighted avg": {
+      "precision": 0.6700493396333917,
+      "recall": 0.6707317073170732,
+      "f1-score": 0.6631209522944346,
+      "support": 8200.0
+    }
+  },
+  "track_split": {
+    "train": 3822,
+    "validation": 819,
+    "test": 820
+  },
+  "genres": [
+    "blues",
+    "classical",
+    "country",
+    "disco",
+    "hiphop",
+    "jazz",
+    "metal",
+    "pop",
+    "reggae",
+    "rock"
+  ],
+  "augmentation": [
+    "brightness",
+    "Gaussian noise",
+    "time masking"
+  ],
+  "model_file": "C:\\Users\\OWNER\\Documents\\NEW FYP\\music_genre_audio_cnn\\results\\gtzan_audio_cnn.keras",
+  "training_graph": "C:\\Users\\OWNER\\Documents\\NEW FYP\\music_genre_audio_cnn\\results\\training_curves.png",
+  "confusion_matrix": "C:\\Users\\OWNER\\Documents\\NEW FYP\\music_genre_audio_cnn\\results\\confusion_matrix.png"
+}

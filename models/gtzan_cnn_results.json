@@ -1,0 +1,27 @@
+{
+  "dataset": "GTZAN",
+  "test_accuracy": 0.10000000149011612,
+  "class_names": [
+    "blues",
+    "classical",
+    "country",
+    "disco",
+    "hiphop",
+    "jazz",
+    "metal",
+    "pop",
+    "reggae",
+    "rock"
+  ],
+  "train_samples": 699,
+  "validation_samples": 150,
+  "test_samples": 150,
+  "epochs_requested": 40,
+  "batch_size": 32,
+  "image_size": {
+    "height": 128,
+    "width": 256
+  },
+  "model_file": "models\\gtzan_cnn.keras",
+  "training_graph": "models\\gtzan_cnn_training.png"
+}
