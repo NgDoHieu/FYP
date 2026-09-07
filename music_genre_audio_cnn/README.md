@@ -26,22 +26,13 @@ music_genre_audio_cnn/
 	results_artist20/        # Artist20 model and evaluation outputs
 ```
 
-## Setup
+## How it works
 
-From the repository root (`NEW FYP`), create the environment and install the dependencies:
+### Dataset organization
 
-```powershell
-uv venv --python 3.12 .venv
-uv pip install --python ".venv\Scripts\python.exe" -r "music_genre_audio_cnn\requirements.txt"
-```
+Each dataset is represented as labeled directories. GTZAN uses ten genre directories, FMA Small uses eight genre directories, and Artist20 uses one directory for each artist. The FMA utilities prepare these directory structures from the original FMA metadata and audio files. The classifier scripts then discover the available files and assign an integer label to each directory.
 
-The scripts require Python 3.12, TensorFlow, librosa, NumPy, Matplotlib, and scikit-learn. The FMA-to-GTZAN conversion script also uses `soundfile`; install it if you use that workflow and it is not already available in your environment.
-
-## Dataset preparation
-
-### GTZAN
-
-The GTZAN trainer expects this structure:
+The expected GTZAN structure is:
 
 ```text
 raw/gtzan/genres/
@@ -49,33 +40,19 @@ raw/gtzan/genres/
 	jazz/        metal/       pop/         reggae/      rock/
 ```
 
-To create GTZAN-style folders from FMA metadata, run the labeling utility from the repository root:
+The FMA Small classifier uses these eight labels:
 
-```powershell
-& ".venv\Scripts\python.exe" "fma_to_gtzan_labeling\label_fma_to_gtzan.py" --limit 500
-```
 
-Use `--dry-run` to preview the mapping. The default source and metadata paths are `raw/fma_small` and `raw/fma_metadata/raw_tracks.csv`; the default output is `raw/gtzan/genres`.
+- Electronic
+- Experimental
+- Folk
+- Hip-Hop
+- Instrumental
+- International
+- Pop
+- Rock
 
-### FMA Small
-
-The FMA trainer uses eight top-level genres: Electronic, Experimental, Folk, Hip-Hop, Instrumental, International, Pop, and Rock. First organize the FMA Small files:
-
-```powershell
-& ".venv\Scripts\python.exe" "fma_to_gtzan_labeling\organize_fma_small.py"
-```
-
-The script reads `raw/fma_small` and `raw/fma_metadata/tracks.csv`, then creates `raw/fma_small_organized/genres`.
-
-### Artist20
-
-Extract the Artist20 MP3 archive once:
-
-```powershell
-tar -xzf "artist20\artist20-mp3s-32k.tgz" -C "artist20"
-```
-
-The expected layout is:
+Artist20 follows an artist and album hierarchy beneath its dataset root:
 
 ```text
 artist20/artist20/mp3s-32k/
@@ -83,28 +60,31 @@ artist20/artist20/mp3s-32k/
 	artist_name_2/album_name/track_01.mp3
 ```
 
-The MP3 archive is sufficient. The precomputed MFCC and chroma archives are not used by this mel-spectrogram CNN.
+The Artist20 model uses the audio archive rather than the precomputed MFCC or chroma feature archives.
 
-## Training
+### Audio preprocessing
 
-Run commands from the repository root:
+For every track, the pipeline:
 
-```powershell
-# GTZAN
-& ".venv\Scripts\python.exe" "music_genre_audio_cnn\train.py"
+1. Loads up to 30 seconds of mono audio at 22,050 Hz.
+2. Computes a 128-bin mel spectrogram using a 2,048-sample FFT and a 512-sample hop length.
+3. Converts mel power to decibels and normalizes the values to the range 0 to 1.
+4. Splits the spectrogram into ten three-second excerpts, padding short excerpts when necessary.
+5. Applies augmentation only to training excerpts: brightness changes, Gaussian noise, and random time masking.
 
-# FMA Small
-& ".venv\Scripts\python.exe" "music_genre_audio_cnn\train_fma.py"
+This produces a consistent four-dimensional input tensor for the CNN while retaining short-term time and frequency information from the original audio.
 
-# Artist20
-& ".venv\Scripts\python.exe" "music_genre_audio_cnn\train_artist20.py"
-```
+### CNN architecture
 
-Artist20 accepts optional arguments:
+The classifiers share the same general architecture. Three convolutional blocks learn increasingly complex spectrogram patterns. Each block uses a convolution, batch normalization, max pooling, and dropout. Global average pooling then converts the feature maps into a compact representation, followed by a 128-unit dense layer and a softmax classification layer.
 
-```powershell
-& ".venv\Scripts\python.exe" "music_genre_audio_cnn\train_artist20.py" --data-dir "path\to\artist20" --epochs 40 --batch-size 32
-```
+The convolutional and dense layers use L2 regularization. Adam optimization trains the network with sparse categorical cross-entropy. Early stopping restores the weights from the best validation-accuracy epoch, while the learning rate is reduced when validation loss stops improving.
+
+### Dataset-specific training
+
+GTZAN and FMA Small classify individual excerpts during evaluation. Their datasets are split by complete track before excerpts are generated, preventing excerpts from the same track from appearing in both training and evaluation data.
+
+Artist20 also splits complete tracks, but combines the ten excerpt predictions by averaging their class probabilities. The final Artist20 result is therefore a track-level artist prediction rather than an individual-excerpt prediction.
 
 ## Outputs and evaluation
 
