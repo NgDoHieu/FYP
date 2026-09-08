@@ -1,4 +1,3 @@
-import argparse
 import ast
 import csv
 import subprocess
@@ -170,20 +169,18 @@ def build_manifest(metadata_path: Path) -> dict[str, str]:
 
 def main() -> None:
     project_root = Path(__file__).resolve().parents[1]
-    parser = argparse.ArgumentParser(description="Map FMA audio tracks into GTZAN-style genre folders.")
-    parser.add_argument("--fma-root", type=Path, default=project_root / "raw" / "fma_small", help="Path to the FMA dataset root, e.g. raw/fma_small")
-    parser.add_argument("--metadata", type=Path, default=project_root / "raw" / "fma_metadata" / "raw_tracks.csv", help="Path to raw/fma_metadata/raw_tracks.csv")
-    parser.add_argument("--output", type=Path, default=project_root / "raw" / "gtzan" / "genres", help="Output folder like raw/gtzan/genres")
-    parser.add_argument("--limit", type=int, default=0, help="Optional cap on copied tracks for testing (0 = no limit)")
-    parser.add_argument("--dry-run", action="store_true", help="Show what would be copied without copying files")
-    args = parser.parse_args()
+    fma_root = project_root / "raw" / "fma_small"
+    metadata_path = project_root / "raw" / "fma_metadata" / "raw_tracks.csv"
+    output_dir = project_root / "raw" / "gtzan" / "genres"
+    limit = 0
+    dry_run = False
 
-    if not args.fma_root.exists():
-        raise FileNotFoundError(f"FMA root not found: {args.fma_root}")
-    if not args.metadata.exists():
-        raise FileNotFoundError(f"FMA metadata not found: {args.metadata}")
+    if not fma_root.exists():
+        raise FileNotFoundError(f"FMA root not found: {fma_root}")
+    if not metadata_path.exists():
+        raise FileNotFoundError(f"FMA metadata not found: {metadata_path}")
 
-    manifest = build_manifest(args.metadata)
+    manifest = build_manifest(metadata_path)
     counts = Counter()
     copied = 0
     skipped_invalid_audio = 0
@@ -194,18 +191,18 @@ def main() -> None:
         if label not in GTZAN_LABELS:
             continue
 
-        source = find_track_file(track_id, args.fma_root)
+        source = find_track_file(track_id, fma_root)
         if source is None:
             continue
 
-        destination_dir = args.output / label
+        destination_dir = output_dir / label
         destination_dir.mkdir(parents=True, exist_ok=True)
 
         destination = destination_dir / f"{source.stem}.wav"
         if destination.exists():
             counts[label] += 0
         else:
-            if not args.dry_run:
+            if not dry_run:
                 if source.suffix.lower() == ".mp3":
                     if not convert_mp3_to_wav(source, destination):
                         skipped_invalid_audio += 1
@@ -215,7 +212,7 @@ def main() -> None:
             counts[label] += 1
             copied += 1
 
-        if args.limit and copied >= args.limit:
+        if limit and copied >= limit:
             break
 
     print("GTZAN labels used:")
@@ -223,7 +220,7 @@ def main() -> None:
         print(f"  {label}: {counts[label]}")
     print(f"Copied/selected tracks: {copied}")
     print(f"Skipped invalid audio files: {skipped_invalid_audio}")
-    if args.dry_run:
+    if dry_run:
         print("Dry run only: no files were copied.")
 
 
